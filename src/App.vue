@@ -46,7 +46,7 @@
                   >{{s.properties.address}}</a>
                 </p>
               </a>
-              </div>
+            </div>
           </ul>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default {
   name: "App",
   data: () => ({
     pharmaciesData: [],
-    stores:[],
+    stores: [],
     mymap: null,
     cityData: null,
     regionData: [],
@@ -91,7 +91,7 @@ export default {
   methods: {
     updateMap() {
       if (this.selectedCity) {
-        this.stores= this.pharmaciesData.filter(
+        this.stores = this.pharmaciesData.filter(
           x => x.properties.county == this.selectedCity
         );
         if (this.selectedRegion) {
@@ -100,8 +100,8 @@ export default {
           );
         }
         this.stores.forEach(pharmacy => {
-          const { properties, geometry } = pharmacy;         
-          
+          const { properties, geometry } = pharmacy;
+
           //icon.iconUrl=properties.mask_adult>50?'./assets/icon/marker-icon-green.png':'./assets/icon/marker-icon-orange.png';
           //console.log(icon);
 
@@ -142,15 +142,33 @@ export default {
     );
   },
   mounted() {
-    this.mymap = L.map("map", {
-      center: [25.03, 121.55],
-      zoom: 15
-    });
+    var self = this;
+    self.mymap = L.map("map", {
+          center: [24.156547, 120.712760],
+          zoom: 12,
+        });
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        self.mymap.setView([pos.coords.latitude, pos.coords.longitude],15);
+        L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(self.mymap)
+        .bindPopup("<h4>目前位置</h4>")
+        .openPopup();
+      },
+      err => {
+        console.error(err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       maxZoom: 18
-    }).addTo(this.mymap);
+    }).addTo(self.mymap);
+    
   }
 };
 </script>
